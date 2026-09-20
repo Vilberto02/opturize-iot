@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "author": "OpTurize Team - UNMSM FISI",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-esp32-devkit-v1",
+      "id": "esp",
+      "top": 120,
+      "left": 150,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-hc-sr04",
+      "id": "us_entry",
+      "top": -90,
+      "left": 20,
+      "attrs": { "distance": "150" }
+    },
+    {
+      "type": "wokwi-hc-sr04",
+      "id": "us_exit",
+      "top": -90,
+      "left": 260,
+      "attrs": { "distance": "150" }
+    },
+    {
+      "type": "wokwi-dht22",
+      "id": "dht",
+      "top": 100,
+      "left": -60,
+      "attrs": { "temperature": "22", "humidity": "72" }
+    },
+    {
+      "type": "board-ssd1306",
+      "id": "oled",
+      "top": 70,
+      "left": 470,
+      "attrs": { "i2cAddress": "0x3c" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_green",
+      "top": 350,
+      "left": 60,
+      "attrs": { "color": "green", "label": "Libre" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "res_green",
+      "top": 390,
+      "left": 60,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_yellow",
+      "top": 350,
+      "left": 120,
+      "attrs": { "color": "yellow", "label": "Moderado" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "res_yellow",
+      "top": 390,
+      "left": 120,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_red",
+      "top": 350,
+      "left": 180,
+      "attrs": { "color": "red", "label": "Lleno" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "res_red",
+      "top": 390,
+      "left": 180,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-servo",
+      "id": "servo",
+      "top": 320,
+      "left": 460,
+      "attrs": { "horn": "cross" }
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "buzzer",
+      "top": 450,
+      "left": 300,
+      "attrs": { "volume": "0.4" }
+    }
+  ],
+  "connections": [
+    [ "esp:VIN", "us_entry:VCC", "red", [ "v-30", "h-140" ] ],
+    [ "esp:GND.1", "us_entry:GND", "black", [ "v-20", "h-130" ] ],
+    [ "esp:D5", "us_entry:TRIG", "blue", [ "v-50", "h-110" ] ],
+    [ "esp:D18", "us_entry:ECHO", "orange", [ "v-60", "h-90" ] ],
+
+    [ "esp:VIN", "us_exit:VCC", "red", [ "v-30", "h100" ] ],
+    [ "esp:GND.1", "us_exit:GND", "black", [ "v-20", "h110" ] ],
+    [ "esp:D19", "us_exit:TRIG", "purple", [ "v-50", "h90" ] ],
+    [ "esp:D25", "us_exit:ECHO", "cyan", [ "v-60", "h110" ] ],
+
+    [ "esp:3V3", "dht:VCC", "red", [ "v-20", "h-180" ] ],
+    [ "esp:GND.2", "dht:GND", "black", [ "v-10", "h-170" ] ],
+    [ "esp:D4", "dht:SDA", "green", [ "v0", "h-160" ] ],
+
+    [ "esp:3V3", "oled:VCC", "red", [ "v-20", "h240" ] ],
+    [ "esp:GND.2", "oled:GND", "black", [ "v-10", "h230" ] ],
+    [ "esp:D22", "oled:SCL", "yellow", [ "v-40", "h220" ] ],
+    [ "esp:D21", "oled:SDA", "blue", [ "v-30", "h210" ] ],
+
+    [ "esp:D12", "res_green:1", "green", [ "v80", "h-70" ] ],
+    [ "res_green:2", "led_green:A", "green", [ "v-10" ] ],
+    [ "led_green:C", "esp:GND.1", "black", [ "v20", "h60", "v-150" ] ],
+
+    [ "esp:D14", "res_yellow:1", "gold", [ "v70", "h-30" ] ],
+    [ "res_yellow:2", "led_yellow:A", "gold", [ "v-10" ] ],
+    [ "led_yellow:C", "esp:GND.1", "black", [ "v20", "h0", "v-150" ] ],
+
+    [ "esp:D27", "res_red:1", "red", [ "v60", "h10" ] ],
+    [ "res_red:2", "led_red:A", "red", [ "v-10" ] ],
+    [ "led_red:C", "esp:GND.1", "black", [ "v20", "h-60", "v-150" ] ],
+
+    [ "esp:VIN", "servo:V+", "red", [ "v120", "h250" ] ],
+    [ "esp:GND.1", "servo:GND", "black", [ "v130", "h240" ] ],
+    [ "esp:D13", "servo:PWM", "blue", [ "v100", "h230" ] ],
+
+    [ "esp:D23", "buzzer:2", "magenta", [ "v150", "h120" ] ],
+    [ "esp:GND.1", "buzzer:1", "black", [ "v160", "h100" ] ]
+  ],
+  "dependencies": {}
+}
