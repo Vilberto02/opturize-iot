@@ -76,19 +76,20 @@ Diseñado y verificado para simulación en **Wokwi** y prototipado físico sobre
 
 ```
 opturize/
-├── docs/                   # Documentación académica de laboratorios
-│   ├── Laboratorio01.pdf   # Propuesta inicial y justificación del proyecto
-│   ├── Laboratorio02.pdf   # Arquitectura general de 3 capas
-│   ├── Laboratorio03.pdf   # Diseño físico, sensores y diagrama circuital
-│   └── Laboratorio04.pdf   # Complemento del laboratorio de sensores
-├── firmware/               # Código embebido ESP32 y simulación Wokwi
-│   ├── sketch.ino          # Firmware Arduino/C++ para ESP32
-│   ├── diagram.json        # Esquema circuital de simulación Wokwi
-│   └── wokwi.toml          # Configuración de simulación Wokwi
+├── docs/                                                 # Documentación académica de laboratorios
+│   ├── Laboratorio01.pdf                                 # Propuesta inicial y justificación del proyecto
+│   ├── Laboratorio02.pdf                                 # Arquitectura general de 3 capas
+│   ├── Laboratorio03.pdf                                 # Diseño físico, sensores y diagrama circuital
+│   ├── Laboratorio04.pdf                                 # Complemento del laboratorio de sensores
+│   └── Laboratorio05_Diseno_Comunicacion_Inalambrica.md # Diseño de la comunicación inalámbrica y telemetría
+├── firmware/                                             # Código embebido ESP32 y simulación Wokwi
+│   ├── sketch.ino                                        # Firmware Arduino/C++ para ESP32
+│   ├── diagram.json                                      # Esquema circuital de simulación Wokwi
+│   └── wokwi.toml                                        # Configuración de simulación Wokwi
 ├── src/
-│   ├── backend/            # API REST, broker/cliente MQTT y lógica de datos
-│   └── frontend/           # Aplicación web interactiva (TanStack Router & Query)
-└── README.md               # Contexto, arquitectura y guía general del proyecto
+│   ├── backend/                                          # API REST, broker/cliente MQTT y lógica de datos
+│   └── frontend/                                         # Aplicación web interactiva (TanStack Router & Query)
+└── README.md                                             # Contexto, arquitectura y guía general del proyecto
 ```
 
 ## Hoja de ruta (Roadmap de implementación)
@@ -97,6 +98,7 @@ opturize/
   - [x] Identificación de problemática y propuesta de solución (Lab 01).
   - [x] Arquitectura de 3 capas Edge-Cloud-App (Lab 02).
   - [x] Diseño físico de sensores, actuadores y circuito Wokwi (Lab 03 & 04).
+  - [x] Diseño de la comunicación inalámbrica, matriz comparativa y telemetría (Lab 05).
 - [x] **Fase 1: Simulación Física e Interactiva (Firmware)**
   - [x] Implementación de `sketch.ino` en C++ para ESP32.
   - [x] Configuración del circuito en `diagram.json` para Wokwi.
