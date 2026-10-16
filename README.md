@@ -107,10 +107,12 @@ opturize/
   - [x] Receptor de telemetría MQTT/HTTP (`src/backend/`).
   - [x] Persistencia de eventos de aforo y cálculo de métricas en tiempo real.
   - [x] API REST para consulta de atractivos y saturación.
-- [ ] **Fase 3: Frontend Web TanStack**
-  - [ ] Interfaz SPA con TanStack Router & TanStack Query (`src/frontend/`).
-  - [ ] Dashboard de control en tiempo real para administradores de sitios turísticos.
-  - [ ] Módulo de recomendación persuasiva de destinos alternativos (Modelo de Fogg).
+- [x] **Fase 3: Frontend Web React, Vite, Zustand, Zod & Visx**
+  - [x] Interfaz web SPA con Vite, React, TypeScript y TailwindCSS (fuente DM Sans, sin emojis).
+  - [x] Gestión de estado con Zustand stores y validación estricta Zod sobre fetch nativo.
+  - [x] Dashboard de control dual: Modo Turista (catálogo y mapa de calor) y Modo Gestor (control ESP32 / MQTT).
+  - [x] Gráficos estadísticos con `@visx` (Airbnb) y mapa de calor geoespacial con Leaflet.
+  - [x] Módulo interactivo de recomendación persuasiva de destinos alternativos (Modelo de Fogg).
 - [ ] **Fase 4: Modelo Predictivo & Preparación para AWS**
   - [ ] Modelo de predicción de afluencia cruzando histórico y clima.
   - [ ] Contenedorización con Docker para migración transparente a AWS (ECS/EC2/RDS).
