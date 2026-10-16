@@ -58,3 +58,4 @@ Thumbs.db
 
 # Wokwi / Simulador temporal
 .wokwi/
+.playwright-mcp
