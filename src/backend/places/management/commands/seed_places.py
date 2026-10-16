@@ -32,6 +32,7 @@ class Command(BaseCommand):
                 "is_alternative_destination": False,
                 "description": "Centro ceremonial de la Cultura Lima (siglo V). Gran afluencia turística en Miraflores.",
                 "fogg_motivation_text": "",
+                "fogg_motivation_short": "",
                 "average_visit_duration_min": 60
             },
             {
@@ -54,6 +55,7 @@ class Command(BaseCommand):
                 "is_alternative_destination": True,
                 "description": "Imponente pirámide trunca preincaica restaurada con museo de sitio interactivo.",
                 "fogg_motivation_text": "¡Descubre la arqueología en San Isidro con 20% de descuento en boletería y visita guiada sin colas!",
+                "fogg_motivation_short": "20% de descuento en boletería y visita guiada sin colas en San Isidro.",
                 "average_visit_duration_min": 45
             },
             {
@@ -76,6 +78,7 @@ class Command(BaseCommand):
                 "is_alternative_destination": True,
                 "description": "Conjunto monumental de cinco pirámides escalonadas de la cultura Ychsma.",
                 "fogg_motivation_text": "Uno de los centros ceremoniales más grandes de Lima. Espacio amplio y tranquilo para toda la familia.",
+                "fogg_motivation_short": "Un gran centro ceremonial de Lima, con espacios amplios para toda la familia.",
                 "average_visit_duration_min": 50
             },
             {
@@ -98,6 +101,7 @@ class Command(BaseCommand):
                 "is_alternative_destination": True,
                 "description": "El oráculo sagrado más trascendente de la costa andina. Gran museo de sitio nacional.",
                 "fogg_motivation_text": "Pase de transporte turístico directo disponible y recorrido panorámico al Templo del Sol.",
+                "fogg_motivation_short": "Pase de transporte turístico directo y recorrido panorámico al Templo del Sol.",
                 "average_visit_duration_min": 90
             }
         ]

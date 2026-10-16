@@ -58,6 +58,13 @@ class TouristPlace(models.Model):
         blank=True,
         help_text='Texto para incentivar al turista (ej: Sin colas, guiado exclusivo, 20% descuento).'
     )
+    fogg_motivation_short = models.CharField(
+        'Motivación breve para la tarjeta Fogg',
+        max_length=140,
+        blank=True,
+        default='',
+        help_text='Beneficio del destino en hasta 140 caracteres. Si está vacío, se genera un mensaje con el distrito.'
+    )
     average_visit_duration_min = models.PositiveIntegerField('Duración Media de Visita (min)', default=45)
 
     last_telemetry_at = models.DateTimeField('Última Telemetría Recibida', null=True, blank=True)

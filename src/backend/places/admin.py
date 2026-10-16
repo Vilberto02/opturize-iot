@@ -36,7 +36,7 @@ class TouristPlaceAdmin(admin.ModelAdmin):
             'fields': ('current_temperature', 'current_humidity', 'last_telemetry_at')
         }),
         ('Estrategia de Descongestión (Modelo de Fogg)', {
-            'fields': ('is_alternative_destination', 'fogg_motivation_text', 'average_visit_duration_min')
+            'fields': ('is_alternative_destination', 'fogg_motivation_text', 'fogg_motivation_short', 'average_visit_duration_min')
         }),
         ('Metadatos', {
             'fields': ('created_at', 'updated_at'),
