@@ -72,6 +72,18 @@ def get_fogg_recommendations(origin_place_id=None):
             else:
                 trigger_msg = f"Afluencia alta en {sat.name} ({sat.occupancy_percentage}%). Recomendamos visitar {alt.name} para un recorrido tranquilo."
 
+            # Mensajes compactos para la tarjeta; los textos completos siguen disponibles para el banner.
+            motivation_short = alt.fogg_motivation_short.strip() or f"Descubre una alternativa en {alt.district}."
+            ability_short = f"A {distance_km:.2f} km · {estimated_transit_min} min en transporte desde el origen."
+            if alt.traffic_state == 'VERDE' and free_slots > 0:
+                capacity_label = 'cupo libre' if free_slots == 1 else 'cupos libres'
+                if sat.traffic_state == 'ROJO':
+                    trigger_short = f"Evita la saturación del origen: el destino tiene {free_slots} {capacity_label}."
+                else:
+                    trigger_short = f"El destino tiene {free_slots} {capacity_label} para una visita más tranquila."
+            else:
+                trigger_short = "Revisa el aforo del destino antes de iniciar el recorrido."
+
             recommendations.append({
                 "origin_place": {
                     "id": sat.id,
@@ -98,6 +110,9 @@ def get_fogg_recommendations(origin_place_id=None):
                     "motivation": motivation_msg,
                     "ability": ability_msg,
                     "trigger": trigger_msg,
+                    "motivation_short": motivation_short,
+                    "ability_short": ability_short,
+                    "trigger_short": trigger_short,
                     "distance_km": distance_km,
                     "estimated_transit_minutes": estimated_transit_min,
                     "cta_button": "Trazar Ruta y Explorar"
