@@ -1,0 +1,91 @@
+@import 'leaflet/dist/leaflet.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --surface: #ffffff;
+    --surface-muted: #f8fafc;
+    --border: #e2e8f0;
+    --ink: #0f172a;
+    --ink-muted: #475569;
+    --accent: #0f766e;
+    --panel-radius: 1rem;
+    --panel-shadow: 0 4px 16px #0f172a08;
+  }
+  body {
+    @apply font-sans bg-slate-50 text-slate-900 antialiased selection:bg-teal-500 selection:text-white;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans tracking-tight;
+  }
+}
+
+@layer components {
+  .surface-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--panel-radius); box-shadow: var(--panel-shadow); }
+  .data-state { @apply flex min-h-40 flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white p-6 text-center sm:p-8; }
+  .skeleton { @apply rounded-lg bg-slate-100 motion-safe:animate-pulse; }
+  .section-title { @apply text-lg font-bold leading-snug tracking-tight text-slate-900; }
+  .section-description { @apply mt-1 text-sm leading-relaxed text-slate-600; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+button, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+
+/* Ajustes profesionales de Leaflet */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  font-family: 'DM Sans', sans-serif;
+  z-index: 1;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 14px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  padding: 2px;
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px;
+  line-height: 1.5;
+}
+
+.leaflet-popup-tip {
+  box-shadow: none;
+}
+
+/* Animación de pulso térmico para zonas críticas */
+@keyframes radar-pulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+}
+
+.thermal-pulse {
+  animation: radar-pulse 2.5s infinite ease-in-out;
+  transform-origin: center;
+}
