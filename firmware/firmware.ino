@@ -525,7 +525,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
         int valor = doc["valor"] | 0;
         if (valor >= 1) {  // evita división entre 0 en map() y en el porcentaje
           maxCapacity = valor;
-          warningThreshold = (int)(maxCapacity * 0.7);
+          warningThreshold = max(1, (int)(maxCapacity * 0.7));
           Serial.printf("[COMANDO] Capacidad máxima actualizada a %d\n", maxCapacity);
         } else {
           Serial.println("[COMANDO !!] Capacidad inválida (debe ser >= 1).");
