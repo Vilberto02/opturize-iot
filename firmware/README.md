@@ -4,7 +4,7 @@ Este módulo contiene el firmware en C++/Arduino para el microcontrolador **ESP3
 
 ## Archivos del módulo
 
-* **[`sketch.ino`](./sketch.ino):** Código fuente C++ para ESP32 con máquina de estados de aforo, control de actuadores, display OLED y telemetría MQTT.
+* **[`firmware.ino`](./firmware.ino):** Código fuente C++ para ESP32 con máquina de estados de aforo, control de actuadores, display OLED y telemetría MQTT.
 * **[`diagram.json`](./diagram.json):** Conexiones y disposición visual de los componentes en Wokwi.
 * **[`libraries.txt`](./libraries.txt):** Dependencias para el compilador de Wokwi (Adafruit SSD1306, ESP32Servo, ArduinoJson, PubSubClient, etc.).
 * **[`wokwi.toml`](./wokwi.toml):** Configuración para la extensión de Wokwi en VS Code.
@@ -35,7 +35,7 @@ Este módulo contiene el firmware en C++/Arduino para el microcontrolador **ESP3
 
 ### Opción 2: En el Navegador Web (Wokwi Web)
 1. Ingresa a [wokwi.com/projects/new/esp32](https://wokwi.com/projects/new/esp32).
-2. Pega el contenido de `sketch.ino` en la pestaña de código.
+2. Pega el contenido de `firmware.ino` en la pestaña de código.
 3. En la pestaña `diagram.json`, reemplaza el JSON con el contenido de `firmware/diagram.json`.
 4. En la pestaña `Library Manager` (o creando `libraries.txt`), añade las librerías indicadas en `libraries.txt`.
 5. Presiona el botón verde de **Play / Simular**.

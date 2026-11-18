@@ -83,7 +83,7 @@ opturize/
 │   ├── Laboratorio04.pdf                                 # Complemento del laboratorio de sensores
 │   └── Laboratorio05_Diseno_Comunicacion_Inalambrica.md # Diseño de la comunicación inalámbrica y telemetría
 ├── firmware/                                             # Código embebido ESP32 y simulación Wokwi
-│   ├── sketch.ino                                        # Firmware Arduino/C++ para ESP32
+│   ├── firmware.ino                                      # Firmware Arduino/C++ para ESP32
 │   ├── diagram.json                                      # Esquema circuital de simulación Wokwi
 │   └── wokwi.toml                                        # Configuración de simulación Wokwi
 ├── src/
@@ -100,7 +100,7 @@ opturize/
   - [x] Diseño físico de sensores, actuadores y circuito Wokwi (Lab 03 & 04).
   - [x] Diseño de la comunicación inalámbrica, matriz comparativa y telemetría (Lab 05).
 - [x] **Fase 1: Simulación Física e Interactiva (Firmware)**
-  - [x] Implementación de `sketch.ino` en C++ para ESP32.
+  - [x] Implementación de `firmware.ino` en C++ para ESP32.
   - [x] Configuración del circuito en `diagram.json` para Wokwi.
   - [x] Validación de la máquina de estados de aforo (Libre, Moderado, Lleno) y actuadores.
 - [x] **Fase 2: Backend y Telemetría Local**
