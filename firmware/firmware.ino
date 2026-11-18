@@ -24,7 +24,8 @@
 #define PIN_ECHO_EXIT    25    // HC-SR04 Salida (Echo)
 
 #define PIN_DHT          4     // Sensor ambiental DHT22/DHT11
-#define DHTTYPE          DHT22
+// Wokwi solo simula DHT22. En la placa física con DHT11, deja DHT11.
+#define DHTTYPE          DHT11   // Cambia a DHT22 para simular en Wokwi
 
 #define PIN_LED_GREEN    12    // Semáforo: Aforo Libre
 #define PIN_LED_YELLOW   14    // Semáforo: Aforo Moderado (Alerta)
@@ -71,12 +72,17 @@ enum TrafficState {
 TrafficState currentState = STATE_FREE;
 TrafficState previousState = STATE_FREE;
 bool barrierOpen = true;
+bool barrierForced = false;     // true = barrera controlada manualmente vía MQTT
+bool barrierForcedOpen = true;  // posición forzada (solo si barrierForced)
 
 // ==========================================
 // RED & TELEMETRÍA (MQTT)
 // ==========================================
+// En Wokwi: "Wokwi-GUEST" sin clave. En la placa física: pon tu red real.
 const char* WIFI_SSID     = "Wokwi-GUEST";
 const char* WIFI_PASSWORD = "";
+unsigned long lastMqttAttempt = 0;
+const unsigned long MQTT_RETRY_MS = 5000; // Reintentar conexión cada 5 s (no bloquear sensores)
 
 const char* MQTT_BROKER   = "broker.hivemq.com";
 const int   MQTT_PORT     = 1883;
@@ -139,7 +145,8 @@ void setup() {
   digitalWrite(PIN_BUZZER, LOW);
 
   // Inicialización Servomotor
-  barrierServo.attach(PIN_SERVO);
+  barrierServo.setPeriodHertz(50);          // SG90 trabaja a 50 Hz
+  barrierServo.attach(PIN_SERVO, 500, 2400); // Pulso mín/máx en µs
   barrierServo.write(90); // Inicialmente abierta (90 grados)
 
   // Inicialización DHT
@@ -195,6 +202,8 @@ void loop() {
     if (!isnan(t) && !isnan(h)) {
       temperature = t;
       humidity = h;
+    } else {
+      Serial.println("[DHT !!] Lectura fallida (revisa cableado/pull-up).");
     }
     lastDhtReadTime = millis();
     updateDisplay();
@@ -315,31 +324,33 @@ void updateTrafficState() {
 // CONTROL DE ACTUADORES FÍSICOS
 // ==========================================
 void updateActuators() {
+  bool autoOpen = true;
   switch (currentState) {
     case STATE_FREE:
       digitalWrite(PIN_LED_GREEN, HIGH);
       digitalWrite(PIN_LED_YELLOW, LOW);
       digitalWrite(PIN_LED_RED, LOW);
-      barrierServo.write(90); // Abierta
-      barrierOpen = true;
+      autoOpen = true;   // Abierta
       break;
 
     case STATE_MODERATE:
       digitalWrite(PIN_LED_GREEN, LOW);
       digitalWrite(PIN_LED_YELLOW, HIGH);
       digitalWrite(PIN_LED_RED, LOW);
-      barrierServo.write(90); // Abierta pero con advertencia
-      barrierOpen = true;
+      autoOpen = true;   // Abierta pero con advertencia
       break;
 
     case STATE_FULL:
       digitalWrite(PIN_LED_GREEN, LOW);
       digitalWrite(PIN_LED_YELLOW, LOW);
       digitalWrite(PIN_LED_RED, HIGH);
-      barrierServo.write(0);  // Talanquera cerrada (bloqueo)
-      barrierOpen = false;
+      autoOpen = false;  // Talanquera cerrada (bloqueo)
       break;
   }
+
+  // Si la barrera fue forzada por MQTT, se respeta esa posición
+  barrierOpen = barrierForced ? barrierForcedOpen : autoOpen;
+  barrierServo.write(barrierOpen ? 90 : 0);
 }
 
 // ==========================================
@@ -464,6 +475,14 @@ void setupWiFi() {
 // ==========================================
 void reconnectMQTT() {
   if (mqttClient.connected()) return;
+  if (millis() - lastMqttAttempt < MQTT_RETRY_MS) return; // no bloquear el loop
+  lastMqttAttempt = millis();
+
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("[WiFi] Sin conexión, reintentando...");
+    WiFi.reconnect();
+    return;
+  }
 
   Serial.print("[MQTT] Conectando a broker HiveMQ...");
   String clientId = "OpTurize-" + String(random(0xffff), HEX);
@@ -495,14 +514,21 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
         currentOccupancy = 0;
         Serial.println("[COMANDO] Aforo reseteado a 0 por control remoto.");
       } else if (strcmp(cmd, "set_capacidad") == 0 && doc.containsKey("valor")) {
-        maxCapacity = doc["valor"];
-        warningThreshold = (int)(maxCapacity * 0.7);
-        Serial.printf("[COMANDO] Capacidad máxima actualizada a %d\n", maxCapacity);
+        int valor = doc["valor"] | 0;
+        if (valor >= 1) {  // evita división entre 0 en map() y en el porcentaje
+          maxCapacity = valor;
+          warningThreshold = (int)(maxCapacity * 0.7);
+          Serial.printf("[COMANDO] Capacidad máxima actualizada a %d\n", maxCapacity);
+        } else {
+          Serial.println("[COMANDO !!] Capacidad inválida (debe ser >= 1).");
+        }
       } else if (strcmp(cmd, "forzar_barrera") == 0 && doc.containsKey("abrir")) {
-        bool abrir = doc["abrir"];
-        barrierServo.write(abrir ? 90 : 0);
-        barrierOpen = abrir;
-        Serial.printf("[COMANDO] Barrera forzada: %s\n", abrir ? "ABIERTA" : "CERRADA");
+        barrierForced = true;
+        barrierForcedOpen = doc["abrir"];
+        Serial.printf("[COMANDO] Barrera forzada: %s\n", barrierForcedOpen ? "ABIERTA" : "CERRADA");
+      } else if (strcmp(cmd, "barrera_auto") == 0) {
+        barrierForced = false;
+        Serial.println("[COMANDO] Barrera vuelve a modo automático.");
       }
       updateTrafficState();
       updateActuators();
