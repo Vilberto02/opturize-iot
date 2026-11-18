@@ -124,6 +124,9 @@ void updateDisplay();
 void publishTelemetry();
 void soundBeep(int frequency, int durationMs);
 void soundAlarm();
+void testBuzzer();
+void i2cDiagnostics();
+int i2cScan(int sda, int scl);
 
 // ==========================================
 // SETUP
@@ -164,6 +167,8 @@ void setup() {
 
   // Inicialización DHT
   dht.begin();
+
+  i2cDiagnostics();
 
   // Inicialización Pantalla OLED
   if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
@@ -229,7 +234,70 @@ void loop() {
     lastTelemetryPublish = millis();
   }
 
+  // 4. Comandos de depuración por el Monitor Serie
+  if (Serial.available()) {
+    char c = Serial.read();
+    if (c == 'b') testBuzzer();
+    if (c == 'i') i2cDiagnostics();
+  }
+
   delay(50); // Breve retardo para estabilidad
+}
+
+// Escanea el bus I2C con los pines dados y devuelve cuántos dispositivos responden
+int i2cScan(int sda, int scl) {
+  Wire.end();
+  Wire.begin(sda, scl, 100000); // 100 kHz: más tolerante a cables largos
+  int found = 0;
+  for (uint8_t addr = 1; addr < 127; addr++) {
+    Wire.beginTransmission(addr);
+    if (Wire.endTransmission() == 0) {
+      Serial.printf("[I2C]   SDA=%d SCL=%d -> dispositivo en 0x%02X\n", sda, scl, addr);
+      found++;
+    }
+  }
+  return found;
+}
+
+// Diagnóstico del OLED: nivel de reposo de las líneas y escaneo normal/invertido
+void i2cDiagnostics() {
+  Wire.end();
+  pinMode(21, INPUT);
+  pinMode(22, INPUT);
+  delay(20);
+  int sdaLevel = digitalRead(21), sclLevel = digitalRead(22);
+  Serial.printf("[I2C] Reposo sin pull-up interno: SDA(D21)=%s  SCL(D22)=%s\n",
+                sdaLevel ? "ALTO" : "BAJO", sclLevel ? "ALTO" : "BAJO");
+  if (!sdaLevel || !sclLevel)
+    Serial.println("[I2C]   Una línea en BAJO: el OLED no tiene alimentación, no hace contacto o esa línea está a GND.");
+
+  int normal = i2cScan(21, 22);
+  if (normal == 0) {
+    Serial.println("[I2C] Nada con SDA=21/SCL=22. Probando invertido...");
+    int swapped = i2cScan(22, 21);
+    if (swapped > 0) Serial.println("[I2C !!] Responde INVERTIDO: intercambia los cables SDA y SCL.");
+    else Serial.println("[I2C !!] Ningún dispositivo ni invertido: falla de alimentación, contacto o módulo.");
+  }
+  Wire.end();
+  Wire.begin(21, 22); // configuración normal para el resto del programa
+}
+
+// Prueba del buzzer: un buzzer pasivo suena con 4 tonos distintos;
+// uno activo suena igual en todos y de forma continua en la parte final.
+void testBuzzer() {
+  Serial.println("[TEST] Buzzer: tonos 500, 1000, 2000 y 3000 Hz...");
+  int freqs[] = {500, 1000, 2000, 3000};
+  for (int f : freqs) {
+    Serial.printf("[TEST]   %d Hz\n", f);
+    tone(PIN_BUZZER, f, 300);
+    delay(400);
+  }
+  Serial.println("[TEST] Buzzer: nivel alto continuo 1 s (para buzzer activo)...");
+  noTone(PIN_BUZZER);
+  digitalWrite(PIN_BUZZER, HIGH);
+  delay(1000);
+  digitalWrite(PIN_BUZZER, LOW);
+  Serial.println("[TEST] Buzzer: fin de la prueba.");
 }
 
 // ==========================================
@@ -477,18 +545,31 @@ void publishTelemetry() {
 // CONEXIÓN WIFI
 // ==========================================
 void setupWiFi() {
+  WiFi.mode(WIFI_STA);
   Serial.printf("\n[WiFi] Conectando a %s", WIFI_SSID);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   int intentos = 0;
-  while (WiFi.status() != WL_CONNECTED && intentos < 20) {
+  while (WiFi.status() != WL_CONNECTED && intentos < 50) { // hasta 15 s
     delay(300);
     Serial.print(".");
     intentos++;
   }
   if (WiFi.status() == WL_CONNECTED) {
-    Serial.printf("\n[WiFi] Conectado exitosamente. IP: %s\n", WiFi.localIP().toString().c_str());
+    Serial.printf("\n[WiFi] Conectado exitosamente. IP: %s  RSSI: %d dBm\n",
+                  WiFi.localIP().toString().c_str(), WiFi.RSSI());
   } else {
-    Serial.println("\n[WiFi] Advertencia: Modo offline o simulación.");
+    // 1 = red no encontrada, 4 = conexión fallida (clave incorrecta), 6 = desconectado
+    Serial.printf("\n[WiFi] No conectado (estado %d). Redes visibles:\n", WiFi.status());
+    WiFi.disconnect(); // no se puede escanear mientras se intenta conectar
+    delay(200);
+    int n = WiFi.scanNetworks();
+    if (n < 0) Serial.printf("   (escaneo fallido, código %d)\n", n);
+    for (int i = 0; i < n; i++) {
+      Serial.printf("   %-32s %4d dBm  canal %2d%s\n", WiFi.SSID(i).c_str(), WiFi.RSSI(i),
+                    WiFi.channel(i), WiFi.SSID(i) == WIFI_SSID ? "  <- tu red" : "");
+    }
+    if (n == 0) Serial.println("   (ninguna)");
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD); // el escaneo interrumpe el intento; se reinicia
   }
 }
 
@@ -501,8 +582,12 @@ void reconnectMQTT() {
   lastMqttAttempt = millis();
 
   if (WiFi.status() != WL_CONNECTED) {
-    Serial.println("[WiFi] Sin conexión, reintentando...");
-    WiFi.reconnect();
+    wl_status_t st = WiFi.status();
+    Serial.printf("[WiFi] Sin conexión (estado %d), reintentando...\n", st);
+    // Mientras sigue intentando (estado 6) no se llama a reconnect(): solo genera errores
+    if (st == WL_CONNECT_FAILED || st == WL_CONNECTION_LOST || st == WL_NO_SSID_AVAIL) {
+      WiFi.reconnect();
+    }
     return;
   }
 
