@@ -92,6 +92,15 @@ opturize/
 └── README.md                                             # Contexto, arquitectura y guía general del proyecto
 ```
 
+## Laboratorio 11
+
+El [desarrollo del laboratorio 11](docs/Labo-Sem11-Desarrollo.pdf) define el MVP gratuito con Wi-Fi, MQTT sobre TLS, EMQX Cloud Serverless, Django y su listener en Northflank Sandbox, PostgreSQL y frontend en Cloudflare Pages. Mantiene los tres productos del laboratorio y distingue las decisiones de diseño de los cambios pendientes de implementación. La disponibilidad está sujeta a las cuotas y condiciones de los planes gratuitos; se debe revisar el estado de Northflank antes de desplegar.
+
+Los diagramas se entregan como código para pegar en un diagrama **Cloud Architecture** de Eraser:
+
+- [Arquitectura Cloud del MVP gratuito](docs/Laboratorio11_Arquitectura_Cloud_Eraser.txt).
+- [Prototipo actual](docs/Laboratorio11_Prototipo_Actual_Eraser.txt).
+
 ## Hoja de ruta (Roadmap de implementación)
 
 - [x] **Fase 0: Definición y Diseño Conceptual**
