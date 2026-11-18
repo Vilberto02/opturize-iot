@@ -32,6 +32,8 @@
 #define PIN_LED_RED      27    // Semáforo: Aforo Completo (Lleno)
 
 #define PIN_SERVO        13    // Talanquera / Barrera física (PWM)
+// 1 = mueve el servo. 0 = modo depuración: no lo usa y solo imprime en consola la posición.
+#define ENABLE_SERVO     0
 #define PIN_BUZZER       23    // Alarma acústica
 
 #define SCREEN_WIDTH     128
@@ -152,9 +154,13 @@ void setup() {
   digitalWrite(PIN_BUZZER, LOW);
 
   // Inicialización Servomotor
+#if ENABLE_SERVO
   barrierServo.setPeriodHertz(50);          // SG90 trabaja a 50 Hz
   barrierServo.attach(PIN_SERVO, 500, 2400); // Pulso mín/máx en µs
   barrierServo.write(90); // Inicialmente abierta (90 grados)
+#else
+  Serial.println("[SERVO] Desactivado (ENABLE_SERVO = 0): solo se informa en consola.");
+#endif
 
   // Inicialización DHT
   dht.begin();
@@ -357,8 +363,16 @@ void updateActuators() {
   }
 
   // Si la barrera fue forzada por MQTT, se respeta esa posición
+  bool wasOpen = barrierOpen;
   barrierOpen = barrierForced ? barrierForcedOpen : autoOpen;
+#if ENABLE_SERVO
   barrierServo.write(barrierOpen ? 90 : 0);
+#else
+  if (barrierOpen != wasOpen) {
+    Serial.printf("[SERVO-DEBUG] Talanquera -> %s (%d grados)\n",
+                  barrierOpen ? "ABIERTA" : "CERRADA", barrierOpen ? 90 : 0);
+  }
+#endif
 }
 
 // ==========================================
