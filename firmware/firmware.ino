@@ -177,6 +177,7 @@ void setup() {
   // Conexión WiFi & MQTT
   setupWiFi();
   mqttClient.setServer(MQTT_BROKER, MQTT_PORT);
+  mqttClient.setBufferSize(512); // por defecto 256 B: el JSON + tópico no cabe y publish() falla
   mqttClient.setCallback(mqttCallback);
 
   updateTrafficState();
