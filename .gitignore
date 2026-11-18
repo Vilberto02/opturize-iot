@@ -59,3 +59,6 @@ Thumbs.db
 # Wokwi / Simulador temporal
 .wokwi/
 .playwright-mcp
+
+# Credenciales Wi-Fi del firmware
+firmware/secrets.h

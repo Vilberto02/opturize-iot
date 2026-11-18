@@ -78,9 +78,16 @@ bool barrierForcedOpen = true;  // posición forzada (solo si barrierForced)
 // ==========================================
 // RED & TELEMETRÍA (MQTT)
 // ==========================================
-// En Wokwi: "Wokwi-GUEST" sin clave. En la placa física: pon tu red real.
-const char* WIFI_SSID     = "Wokwi-GUEST";
-const char* WIFI_PASSWORD = "";
+// Placa física: copia secrets.example.h como secrets.h y pon tu red (secrets.h no se sube a git).
+// Sin secrets.h se usa la red de Wokwi.
+#if __has_include("secrets.h")
+#include "secrets.h"
+#else
+#define SECRET_WIFI_SSID     "Wokwi-GUEST"
+#define SECRET_WIFI_PASSWORD ""
+#endif
+const char* WIFI_SSID     = SECRET_WIFI_SSID;
+const char* WIFI_PASSWORD = SECRET_WIFI_PASSWORD;
 unsigned long lastMqttAttempt = 0;
 const unsigned long MQTT_RETRY_MS = 5000; // Reintentar conexión cada 5 s (no bloquear sensores)
 
